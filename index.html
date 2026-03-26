@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheran College of Physiotherapy - Fee Payment</title>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--purple:#6C3FCF;--purple-dark:#4A2A99;--purple-bg:#F4F0FC;--text:#1a1a2e;--muted:#6b6b8a;--border:#e2dff0;--bg:#f8f7fc;--green:#16a34a;--red:#dc2626;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);}
+.topbar{background:var(--purple);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px;}
+.topbar-logo{width:36px;height:36px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.topbar-title{font-size:16px;font-weight:600;}
+.topbar-sub{font-size:12px;opacity:.8;}
+.wrap{max-width:520px;margin:0 auto;padding:24px 16px 60px;}
+.steps{display:flex;align-items:center;margin-bottom:28px;}
+.step{display:flex;flex-direction:column;align-items:center;flex:1;}
+.sc{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;border:2px solid var(--border);background:#fff;color:var(--muted);transition:all .3s;}
+.sc.active{background:var(--purple);border-color:var(--purple);color:#fff;}
+.sc.done{background:var(--green);border-color:var(--green);color:#fff;}
+.sl{font-size:11px;color:var(--muted);margin-top:4px;}
+.ln{flex:1;height:2px;background:var(--border);margin:0 4px;margin-bottom:20px;transition:background .3s;}
+.ln.done{background:var(--green);}
+.card{background:#fff;border-radius:16px;border:1px solid var(--border);padding:24px;margin-bottom:16px;}
+.ct{font-size:15px;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.ci{width:28px;height:28px;border-radius:8px;background:var(--purple-bg);display:flex;align-items:center;justify-content:center;font-size:15px;}
+.pr{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.av{width:44px;height:44px;border-radius:50%;background:var(--purple-bg);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--purple);}
+.fg{margin-bottom:14px;}
+label{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-bottom:5px;}
+input,select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);color:var(--text);outline:none;transition:border .2s;}
+input:focus,select:focus{border-color:var(--purple);background:#fff;}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.rq{color:var(--red);}
+.fi{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.fi:last-child{border-bottom:none;}
+.fi label{cursor:pointer;font-size:14px;color:var(--text);margin:0;}
+.fs{font-size:11px;color:var(--muted);margin-top:2px;}
+.famt{font-weight:600;font-size:14px;}
+.tradio{width:18px;height:18px;accent-color:var(--purple);cursor:pointer;}
+.tbox{background:var(--purple-bg);border-radius:12px;padding:14px 16px;margin-top:12px;}
+.tr{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px;}
+.tr.main{font-size:16px;font-weight:700;color:var(--purple);margin-bottom:0;}
+.btn{width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:all .2s;margin-top:8px;}
+.bp{background:var(--purple);color:#fff;}
+.bp:hover{background:var(--purple-dark);}
+.bp:disabled{opacity:.6;cursor:not-allowed;}
+.bo{background:#fff;color:var(--purple);border:1.5px solid var(--purple);margin-top:8px;}
+.ir{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.ir:last-child{border-bottom:none;}
+.il{color:var(--muted);}
+.iv{font-weight:500;text-align:right;max-width:60%;}
+.popt{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border:1.5px solid var(--purple);background:var(--purple-bg);border-radius:12px;}
+.ntc{border-radius:10px;padding:10px 14px;font-size:12px;display:flex;gap:8px;margin-top:12px;}
+.nw{background:#fffbeb;border:1px solid #fde68a;color:#92400e;}
+.ns{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;}
+.pg{display:none;}
+.pg.active{display:block;}
+.rh{text-align:center;padding:16px 0 20px;border-bottom:2px solid var(--border);margin-bottom:20px;}
+.rtitle{font-size:22px;font-weight:700;letter-spacing:-.3px;}
+.rsub{font-size:13px;color:var(--muted);margin-top:2px;}
+.rsect{font-size:14px;font-weight:600;margin:20px 0 10px;}
+.rtbl{width:100%;font-size:13px;border-collapse:collapse;}
+.rtbl td{padding:7px 0;border-bottom:1px solid #f0eef8;vertical-align:top;}
+.rtbl tr:last-child td{border-bottom:none;}
+.rtbl td:first-child{color:var(--muted);width:45%;}
+.rtbl td:last-child{font-weight:500;}
+.rbx{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:12px 0;}
+.rbr{display:flex;justify-content:space-between;padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);}
+.rbr:last-child{border-bottom:none;background:var(--purple-bg);font-weight:700;color:var(--purple);}
+.rft{margin-top:20px;padding-top:16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);}
+.rft p{margin-bottom:6px;}
+.rpw{display:flex;justify-content:space-between;margin-top:14px;font-size:12px;}
+.sbanner{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.sick{width:40px;height:40px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:20px;}
+.bdl{background:#fff;color:var(--purple);border:1.5px solid var(--purple);padding:11px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;}
+.bdl:hover{background:var(--purple-bg);}
+@media print{.np{display:none!important;}body{background:#fff;}.topbar{display:none;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">
+    <svg viewBox="0 0 36 36" fill="none" width="22" height="22">
+      <circle cx="18" cy="18" r="16" fill="#6C3FCF"/>
+      <path d="M10 18 Q14 10 18 14 Q22 18 26 12" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path d="M10 22 Q14 14 18 18 Q22 22 26 16" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".6"/>
+    </svg>
+  </div>
+  <div>
+    <div class="topbar-title">Cheran College of Physiotherapy</div>
+    <div class="topbar-sub">Coimbatore, Tamil Nadu</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="steps">
+    <div class="step"><div class="sc active" id="s1">1</div><div class="sl">Details</div></div>
+    <div class="ln" id="l1"></div>
+    <div class="step"><div class="sc" id="s2">2</div><div class="sl">Select Fee</div></div>
+    <div class="ln" id="l2"></div>
+    <div class="step"><div class="sc" id="s3">3</div><div class="sl">Pay</div></div>
+    <div class="ln" id="l3"></div>
+    <div class="step"><div class="sc" id="s4">4</div><div class="sl">Receipt</div></div>
+  </div>
+
+  <!-- PAGE 1: DETAILS -->
+  <div class="pg active" id="page1">
+    <div class="card">
+      <div class="ct"><span class="ci">👤</span>Applicant Details</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:18px;">Fill out the applicant information and let us assist you better with the fee payment.</p>
+      <div class="fg"><label>Customer ID <span class="rq">*</span></label><input type="text" id="customerId" placeholder="e.g. CUST005631"></div>
+      <div class="fr">
+        <div class="fg"><label>Academic Year <span class="rq">*</span></label>
+          <select id="year"><option value="">Select Year</option><option>2023-2024</option><option>2024-2025</option><option>2025-2026</option></select></div>
+        <div class="fg"><label>Batch <span class="rq">*</span></label>
+          <select id="batch"><option value="">Select Batch</option><option>2019</option><option>2020</option><option>2021</option><option>2022</option><option>2023</option></select></div>
+      </div>
+      <div class="fg"><label>Full Name <span class="rq">*</span></label><input type="text" id="name" placeholder="e.g. Gokul Krishna Patrasamy"></div>
+      <div class="fg"><label>Email <span class="rq">*</span></label><input type="email" id="email" placeholder="student@gmail.com"></div>
+      <div class="fg"><label>Mobile Number <span class="rq">*</span></label><input type="tel" id="phone" placeholder="+91 98765 43210"></div>
+      <div class="fr">
+        <div class="fg"><label>Degree <span class="rq">*</span></label>
+          <select id="degree"><option value="">Select</option><option>Bachelor of Physiotherapy</option><option>Master of Physiotherapy</option></select></div>
+        <div class="fg"><label>Year of Study <span class="rq">*</span></label>
+          <select id="yearOfStudy"><option value="">Select</option><option>I Year</option><option>II Year</option><option>III Year</option><option>IV Year</option><option>Final Year</option></select></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>Student Category <span class="rq">*</span></label>
+          <select id="category"><option value="">Select</option><option>Day Scholar</option><option>Hosteller</option></select></div>
+        <div class="fg"><label>Student Status <span class="rq">*</span></label>
+          <select id="status"><option value="">Select</option><option>Live Student</option><option>Passed Out</option></select></div>
+      </div>
+      <button class="btn bp" onclick="goToStep2()">Save &amp; Next &#8594;</button>
+    </div>
+  </div>
+
+  <!-- PAGE 2: SELECT FEE -->
+  <div class="pg" id="page2">
+    <div class="card">
+      <div class="pr">
+        <div class="av" id="avInit">--</div>
+        <div><div style="font-size:15px;font-weight:600;" id="pName">--</div><div style="font-size:12px;color:var(--muted);" id="pMeta">--</div></div>
+      </div>
+      <div class="ct"><span class="ci">💰</span>Pending Fees</div>
+      <div id="feeList"></div>
+      <div class="tbox" id="totalBox" style="display:none;">
+        <div class="tr"><span>Fee Head</span><span id="tFeeHead">--</span></div>
+        <div class="tr"><span>Payable Fees</span><span id="tPayable">--</span></div>
+        <div class="tr main"><span>Total Amount</span><span id="tTotal">--</span></div>
+      </div>
+    </div>
+    <button class="btn bp" onclick="goToStep3()">Proceed to Payment &#8594;</button>
+    <button class="btn bo" onclick="goToPage(1)">&#8592; Back</button>
+  </div>
+
+  <!-- PAGE 3: PAYMENT -->
+  <div class="pg" id="page3">
+    <div class="card">
+      <div class="ct"><span class="ci">🔐</span>Personal Details</div>
+      <div class="ir"><span class="il">Phone</span><span class="iv" id="p3Phone">--</span></div>
+      <div class="ir"><span class="il">Name</span><span class="iv" id="p3Name">--</span></div>
+      <div class="ir"><span class="il">Customer ID</span><span class="iv" id="p3CustId">--</span></div>
+    </div>
+    <div class="card">
+      <div class="ct"><span class="ci">⭐</span>Fee Breakup</div>
+      <div class="ir"><span class="il">Fee Head</span><span class="iv" id="p3FeeType">--</span></div>
+      <div class="ir"><span class="il">Payable Fees</span><span class="iv" id="p3Payable">--</span></div>
+      <div class="ir" style="border-bottom:none;"><span class="il" style="font-weight:600;">Total Amount</span><span class="iv" style="font-weight:700;color:var(--purple);font-size:16px;" id="p3Total">--</span></div>
+    </div>
+    <div class="card">
+      <div class="ct"><span class="ci">💳</span>Payment Options</div>
+      <div class="popt">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">🏦</span>
+          <div><div style="font-size:14px;font-weight:500;">Pay Now</div><div style="font-size:11px;color:var(--muted);">UPI, Credit, Debit, NetBanking</div></div>
+        </div>
+        <input type="radio" style="width:18px;height:18px;accent-color:var(--purple);" checked>
+      </div>
+    </div>
+    <div class="ntc nw"><span>⏱</span><span>Please pay within 15 minutes to avoid session expiry.</span></div>
+    <div class="ntc ns" style="margin-top:8px;"><span>🔒</span><span>100% safe and secure payment powered by Razorpay.</span></div>
+    <button class="btn bp" onclick="initiatePayment()" id="payBtn">Pay Now &#8212; &#8377;<span id="payAmt">0</span></button>
+    <button class="btn bo" onclick="goToPage(2)">&#8592; Back</button>
+  </div>
+
+  <!-- PAGE 4: RECEIPT -->
+  <div class="pg" id="page4">
+    <div class="sbanner">
+      <div class="sick">&#10003;</div>
+      <div>
+        <div style="font-size:15px;font-weight:600;color:#166534;">Payment Successful!</div>
+        <div style="font-size:12px;color:var(--green);">Your fee has been recorded and receipt generated.</div>
+      </div>
+    </div>
+
+    <div class="card" id="receiptCard">
+      <div class="rh">
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;">
+          <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+            <circle cx="26" cy="26" r="24" fill="#EEE8FC"/>
+            <circle cx="26" cy="26" r="20" fill="#6C3FCF"/>
+            <path d="M15 26 Q20 16 26 20 Q32 24 37 15" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M15 32 Q20 22 26 26 Q32 30 37 21" stroke="white" stroke-width="2" stroke-linecap="round" fill="none" opacity=".7"/>
+          </svg>
+        </div>
+        <div class="rtitle">Payment Receipt</div>
+        <div class="rsub">Cheran College of Physiotherapy, Coimbatore, Tamil Nadu</div>
+      </div>
+
+      <table class="rtbl">
+        <tr><td>Customer ID</td><td id="rCustId" style="font-weight:700;">--</td></tr>
+        <tr><td>Institute Name</td><td style="font-weight:700;">Cheran College of Physiotherapy, Coimbatore, Tamil Nadu</td></tr>
+        <tr><td>Name</td><td id="rName" style="font-weight:700;">--</td></tr>
+        <tr><td>Email</td><td id="rEmail" style="font-weight:700;">--</td></tr>
+        <tr><td>Mobile</td><td id="rMobile" style="font-weight:700;">--</td></tr>
+        <tr><td>Degree</td><td id="rDegree" style="font-weight:700;">--</td></tr>
+        <tr><td>Current Year Of Study</td><td id="rYearStudy" style="font-weight:700;">--</td></tr>
+        <tr><td>Batch</td><td id="rBatch" style="font-weight:700;">--</td></tr>
+        <tr><td>Payment Date</td><td id="rDate" style="font-weight:700;">--</td></tr>
+        <tr><td>Order Id</td><td id="rOrderId" style="font-weight:700;">--</td></tr>
+        <tr><td>Fee Name</td><td id="rFeeName" style="font-weight:700;">--</td></tr>
+        <tr><td>Payment Mode</td><td style="font-weight:700;">Online</td></tr>
+        <tr><td>Total Fee Amount</td><td id="rTotalFee" style="font-weight:700;color:var(--purple);">--</td></tr>
+      </table>
+
+      <div class="rsect">Payment Breakup</div>
+      <div class="rbx">
+        <div class="rbr"><span id="rBLabel">--</span><span id="rBAmt" style="font-weight:600;">--</span></div>
+        <div class="rbr">
+          <span></span>
+          <div style="text-align:right;">
+            <div style="font-size:11px;color:var(--muted);font-weight:400;margin-bottom:2px;">Paid Amount</div>
+            <div id="rPaid" style="font-size:15px;">--</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rft">
+        <p>*This fee is directly transferred to the institute account. In case you have concerns, please contact the institute directly.</p>
+        <p>This is system generated receipt and does not require a signature.</p>
+        <div class="rpw">
+          <div style="font-weight:700;font-size:14px;">Powered by <span style="color:var(--purple);">Collexo</span></div>
+          <div style="text-align:right;">support@collexo.com<br>+91- 9910706858</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="bdl np" onclick="downloadReceipt()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download Receipt (PDF)
+    </button>
+    <button class="bdl np" onclick="window.print()" style="margin-top:6px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print Receipt
+    </button>
+    <button class="btn bo np" onclick="resetForm()" style="margin-top:8px;">Pay Another Fee</button>
+  </div>
+
+</div>
+
+<script>
+var RZP_KEY  = 'rzp_test_SVWXFplpBNxYvz';
+var SB_URL   = 'https://ttjxmnsiraatycnyhapr.supabase.co';
+var SB_ANON  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0anhtbnNpcmFhdHljbnloYXByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NDczNTMsImV4cCI6MjA5MDAyMzM1M30.v-UyxfU43k6ySpnYkEpGJs2kIMayXbLAs2mnnw4Q5Hc';
+
+var FEES = [
+  {id:'t1',name:'Tuition Fee - Semester 1 (Day Scholar)',amt:62500},
+  {id:'t2',name:'Tuition Fee - Semester 2 (Day Scholar)',amt:62500},
+  {id:'t3',name:'Tuition Fee - Semester 3 (Day Scholar)',amt:62500},
+  {id:'t4',name:'Tuition Fee - Semester 4 (Day Scholar)',amt:62500},
+  {id:'t5',name:'Tuition Fee - Semester 5 (Day Scholar)',amt:62500},
+  {id:'t6',name:'Tuition Fee - Semester 6 (Day Scholar)',amt:62500},
+  {id:'t7',name:'Tuition Fee - Semester 7 (Day Scholar)',amt:62500},
+  {id:'t8',name:'Tuition Fee - Semester 8 (Day Scholar)',amt:62500},
+  {id:'h1',name:'Tuition Fee - Semester 1 (Hosteller)',amt:85000},
+  {id:'h8',name:'Tuition Fee - Semester 8 (Hosteller)',amt:85000},
+  {id:'cv',name:'Convocation Fees',amt:3200},
+  {id:'ex',name:'Exam Fees - Semester 8',amt:5000}
+];
+
+var pg = 1;
+var fd = {};
+var fee = null;
+var sb = null;
+
+window.addEventListener('DOMContentLoaded', function() {
+  try {
+    sb = supabase.createClient(SB_URL, SB_ANON);
+    console.log('Supabase connected');
+  } catch(e) {
+    console.warn('Supabase error', e);
+  }
+});
+
+function goToPage(n) {
+  document.getElementById('page'+pg).classList.remove('active');
+  pg = n;
+  document.getElementById('page'+n).classList.add('active');
+  for (var i = 1; i <= 4; i++) {
+    var c = document.getElementById('s'+i);
+    c.classList.remove('active','done');
+    if (i < n) { c.classList.add('done'); c.textContent = '\u2713'; }
+    else if (i === n) { c.classList.add('active'); c.textContent = i; }
+    else { c.textContent = i; }
+    if (i < 4) {
+      var l = document.getElementById('l'+i);
+      if (i < n) l.classList.add('done');
+      else l.classList.remove('done');
+    }
+  }
+  window.scrollTo(0,0);
+}
+
+function goToStep2() {
+  var ids = ['customerId','name','email','phone','degree','yearOfStudy','year','batch','category','status'];
+  for (var i = 0; i < ids.length; i++) {
+    var el = document.getElementById(ids[i]);
+    if (!el.value.trim()) {
+      el.focus();
+      el.style.borderColor = 'var(--red)';
+      setTimeout((function(e){ return function(){ e.style.borderColor=''; }; })(el), 2000);
+      alert('Please fill all required fields.');
+      return;
+    }
+  }
+  fd = {
+    customerId: document.getElementById('customerId').value.trim(),
+    name:       document.getElementById('name').value.trim(),
+    email:      document.getElementById('email').value.trim(),
+    phone:      document.getElementById('phone').value.trim(),
+    degree:     document.getElementById('degree').value,
+    yearOfStudy:document.getElementById('yearOfStudy').value,
+    year:       document.getElementById('year').value,
+    batch:      document.getElementById('batch').value,
+    category:   document.getElementById('category').value,
+    status:     document.getElementById('status').value
+  };
+  var parts = fd.name.split(' ');
+  var ini = '';
+  for (var i = 0; i < Math.min(2, parts.length); i++) ini += parts[i][0];
+  document.getElementById('avInit').textContent = ini.toUpperCase();
+  document.getElementById('pName').textContent = fd.name;
+  document.getElementById('pMeta').textContent = fd.customerId + ' \u00b7 ' + fd.degree;
+  var fl = document.getElementById('feeList');
+  fl.innerHTML = '';
+  for (var j = 0; j < FEES.length; j++) {
+    var f = FEES[j];
+    var div = document.createElement('div');
+    div.className = 'fi';
+    div.setAttribute('data-id', f.id);
+    div.innerHTML =
+      '<div><label>' + f.name + '</label>' +
+      '<div class="fs">' + fd.year + ' \u00b7 ' + fd.category + '</div></div>' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+      '<span class="famt">\u20b9' + f.amt.toLocaleString('en-IN') + '.00</span>' +
+      '<input type="radio" class="tradio" name="feeSelect" id="fee_' + f.id + '">' +
+      '</div>';
+    div.addEventListener('click', (function(fid){ return function(){ selectFee(fid); }; })(f.id));
+    fl.appendChild(div);
+  }
+  goToPage(2);
+}
+
+function selectFee(id) {
+  for (var i = 0; i < FEES.length; i++) {
+    if (FEES[i].id === id) { fee = FEES[i]; break; }
+  }
+  document.getElementById('fee_'+id).checked = true;
+  document.getElementById('totalBox').style.display = 'block';
+  var fmt = '\u20b9' + fee.amt.toLocaleString('en-IN') + '.00';
+  document.getElementById('tFeeHead').textContent = fee.name;
+  document.getElementById('tPayable').textContent = fmt;
+  document.getElementById('tTotal').textContent = fmt;
+}
+
+function goToStep3() {
+  if (!fee) { alert('Please select a fee to pay.'); return; }
+  var fmt = '\u20b9' + fee.amt.toLocaleString('en-IN') + '.00';
+  document.getElementById('p3Phone').textContent = fd.phone;
+  document.getElementById('p3Name').textContent = fd.name;
+  document.getElementById('p3CustId').textContent = fd.customerId;
+  document.getElementById('p3FeeType').textContent = fee.name;
+  document.getElementById('p3Payable').textContent = fmt;
+  document.getElementById('p3Total').textContent = fmt;
+  document.getElementById('payAmt').textContent = fee.amt.toLocaleString('en-IN');
+  goToPage(3);
+}
+
+function initiatePayment() {
+  var btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  btn.textContent = 'Opening Razorpay...';
+  var options = {
+    key: RZP_KEY,
+    amount: fee.amt * 100,
+    currency: 'INR',
+    name: 'Cheran College of Physiotherapy',
+    description: fee.name,
+    prefill: { name: fd.name, email: fd.email, contact: fd.phone },
+    notes: { customer_id: fd.customerId, fee_name: fee.name },
+    theme: { color: '#6C3FCF' },
+    handler: function(response) {
+      completePayment(
+        response.razorpay_order_id || 'N/A',
+        response.razorpay_payment_id
+      );
+    },
+    modal: {
+      ondismiss: function() {
+        btn.disabled = false;
+        btn.innerHTML = 'Pay Now &#8212; &#8377;<span id="payAmt">' + fee.amt.toLocaleString('en-IN') + '</span>';
+      }
+    }
+  };
+  var rzp = new Razorpay(options);
+  rzp.open();
+}
+
+function completePayment(orderId, paymentId) {
+  var now = new Date();
+  var dateStr = now.toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'});
+  var ref = (orderId !== 'N/A') ? orderId : (fd.customerId + '_' + Date.now());
+  var fmt = '\u20b9' + fee.amt.toLocaleString('en-IN') + '.00';
+
+  if (sb) {
+    sb.from('fee_payments').insert([{
+      customer_id: fd.customerId,
+      student_name: fd.name,
+      email: fd.email,
+      phone: fd.phone,
+      degree: fd.degree,
+      year_of_study: fd.yearOfStudy,
+      batch: fd.batch,
+      academic_year: fd.year,
+      student_category: fd.category,
+      student_status: fd.status,
+      fee_name: fee.name,
+      fee_amount: fee.amt,
+      razorpay_order_id: orderId,
+      razorpay_payment_id: paymentId,
+      payment_mode: 'Online',
+      institute: 'Cheran College of Physiotherapy, Coimbatore, Tamil Nadu',
+      paid_at: now.toISOString()
+    }]).then(function(result) {
+      if (result.error) console.error('Supabase error:', result.error);
+      else console.log('Payment saved to Supabase');
+    });
+  }
+
+  document.getElementById('rCustId').textContent = fd.customerId;
+  document.getElementById('rName').textContent = fd.name;
+  document.getElementById('rEmail').textContent = fd.email;
+  document.getElementById('rMobile').textContent = fd.phone;
+  document.getElementById('rDegree').textContent = fd.degree;
+  document.getElementById('rYearStudy').textContent = fd.yearOfStudy;
+  document.getElementById('rBatch').textContent = fd.batch;
+  document.getElementById('rDate').textContent = dateStr;
+  document.getElementById('rOrderId').textContent = ref;
+  document.getElementById('rFeeName').textContent = fee.name;
+  document.getElementById('rTotalFee').textContent = fmt;
+  document.getElementById('rBLabel').textContent = fee.name;
+  document.getElementById('rBAmt').textContent = fee.amt.toLocaleString('en-IN') + '.00';
+  document.getElementById('rPaid').textContent = fmt;
+  goToPage(4);
+}
+
+function downloadReceipt() {
+  var css = '<style>body{font-family:Segoe UI,sans-serif;max-width:620px;margin:30px auto;color:#1a1a2e;font-size:13px;}' +
+    'h3{font-size:22px;font-weight:700;text-align:center;margin:8px 0 4px;}' +
+    '.sub{text-align:center;font-size:12px;color:#6b6b8a;margin-bottom:20px;padding-bottom:20px;border-bottom:2px solid #e2dff0;}' +
+    'table{width:100%;border-collapse:collapse;}td{padding:7px 0;border-bottom:1px solid #f0eef8;vertical-align:top;}' +
+    'td:first-child{color:#6b6b8a;width:45%;}td:last-child{font-weight:500;}' +
+    '.st{font-size:14px;font-weight:600;margin:20px 0 10px;}' +
+    '.bx{border:1px solid #e2dff0;border-radius:8px;overflow:hidden;margin:12px 0;}' +
+    '.br{display:flex;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #e2dff0;}' +
+    '.br:last-child{background:#f4f0fc;font-weight:700;color:#6C3FCF;border-bottom:none;}' +
+    '.ft{font-size:11px;color:#6b6b8a;margin-top:20px;padding-top:16px;border-top:1px solid #e2dff0;}' +
+    '.ft p{margin-bottom:6px;}' +
+    '.pw{display:flex;justify-content:space-between;margin-top:14px;font-size:12px;}' +
+    '.pw strong{font-size:14px;font-weight:700;}' +
+    'svg{display:block;margin:0 auto 8px;}</style>';
+  var body = document.getElementById('receiptCard').innerHTML;
+  var w = window.open('', '_blank');
+  w.document.write('<!DOCTYPE html><html><head><title>Payment Receipt</title>' + css + '</head><body>' + body + '</body></html>');
+  w.document.close();
+  setTimeout(function() { w.focus(); w.print(); }, 600);
+}
+
+function resetForm() {
+  fd = {};
+  fee = null;
+  var inputs = document.querySelectorAll('input[type=text], input[type=email], input[type=tel]');
+  for (var i = 0; i < inputs.length; i++) inputs[i].value = '';
+  var selects = document.querySelectorAll('select');
+  for (var i = 0; i < selects.length; i++) selects[i].value = '';
+  goToPage(1);
+}
+</script>
+</body>
+</html>
